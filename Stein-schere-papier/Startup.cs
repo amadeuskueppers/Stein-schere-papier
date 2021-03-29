@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using Repository;
 
 namespace Stein_schere_papier
 {
@@ -20,6 +21,7 @@ namespace Stein_schere_papier
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddSingleton<ISpielLogic, SpielLogic>();
+            services.AddSingleton<ISpielRepository, SpielRepository>();
 
             services.AddControllers();
             services.AddSwaggerGen(c =>

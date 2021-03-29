@@ -1,35 +1,45 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using DataClasses;
+using Repository;
 
 namespace Stein_schere_papier
 {
     public class SpielLogic : ISpielLogic
     {
-        private readonly List<Spiel> _spiele = new();
+        private readonly ISpielRepository _spielRepository;
+
+        public SpielLogic(ISpielRepository spielRepository)
+        {
+            _spielRepository = spielRepository;
+        }
 
         public IEnumerable<Spiel> GetAlleSpiele()
         {
-            return _spiele;
+            var entries = _spielRepository.GetAll().ToList();
+            return entries;
         }
 
         public Spiel NeuesSpielErstellen()
         {
-            var neueId = _spiele.Any() ? _spiele.Max(s => s.Id) + 1 : 1;
+            var repositoryEntries = _spielRepository.GetAll();
+
+            var neueId = repositoryEntries.Any() ? repositoryEntries.Max(s => s.Id) + 1 : 1;
 
             var neuesSpiel = new Spiel
             {
                 Id = neueId
             };
 
-            _spiele.Add(neuesSpiel);
+            _spielRepository.Add(neuesSpiel);
 
             return neuesSpiel;
         }
 
         public Spiel SpielerZuSpielHinzufuegen(int spielId, Spieler spieler)
         {
-            var betroffenesSpiel = _spiele.Find(s => s.Id == spielId);
+            var betroffenesSpiel = _spielRepository.GetById(spielId);
 
             var ersterSpielerNull = betroffenesSpiel.ErstenSpieler == null;
             var zweiterSpielerNull = betroffenesSpiel.ZweitenSpieler == null;
@@ -74,7 +84,7 @@ namespace Stein_schere_papier
         {
             Spieler gewinner = null;
 
-            var betroffeneSpiel = _spiele.Find(s => s.Id == spielId);
+            var betroffeneSpiel = _spielRepository.GetById(spielId);
 
             var spieler1GewaehlterGegenstand = betroffeneSpiel.ErstenSpieler.Gegenstandsauswahl;
             var spieler2GewaehlterGegenstand = betroffeneSpiel.ZweitenSpieler.Gegenstandsauswahl;
@@ -109,7 +119,7 @@ namespace Stein_schere_papier
         {
             var maximaleSpielerId = 0;
 
-            foreach (var spiel in _spiele)
+            foreach (var spiel in _spielRepository.GetAll())
             {
                 var spieler1IdHoeherMax = spiel.ErstenSpieler?.Id > maximaleSpielerId;
                 if (spieler1IdHoeherMax) maximaleSpielerId = spiel.ErstenSpieler.Id;
